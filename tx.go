@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/clong1995/go-ansi-color"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"log"
 )
 
 // BatchTx 批量数据的插入
@@ -26,28 +27,54 @@ func BatchTx(tx pgx.Tx, query string, data [][]any) (err error) {
 }
 
 // CopyTx 超大量数据插入的
-func CopyTx(tx pgx.Tx, tableName string, columnNames []string, data [][]any) {
+func CopyTx(tx pgx.Tx, tableName string, columnNames []string, data [][]any) (rowsAffected int64, err error) {
 	table := pgx.Identifier{tableName}
-	_, err := tx.CopyFrom(
+	if rowsAffected, err = tx.CopyFrom(
 		context.Background(),
 		table,
 		columnNames,
 		pgx.CopyFromRows(data),
-	)
+	); err != nil {
+		log.Println(pcolor.Error(err))
+		return
+	}
+	return
+}
+
+// Tx 事物
+func Tx(handle func(tx pgx.Tx) (err error)) (err error) {
+	tx, err := mainPool.Begin(context.Background())
 	if err != nil {
 		log.Println(pcolor.Error(err))
 		return
 	}
+	defer func() {
+		if err != nil {
+			if rollbackErr := tx.Rollback(context.Background()); rollbackErr != nil {
+				log.Println(pcolor.Error(rollbackErr))
+			}
+		} else {
+			if commitErr := tx.Commit(context.Background()); commitErr != nil {
+				log.Println(pcolor.Error(commitErr))
+			}
+		}
+	}()
+
+	if err = handle(tx); err != nil {
+		log.Println(pcolor.Error(err))
+		return
+	}
+	return
 }
 
-// Tx 事物
-func Tx(db []string, handle func(tx []pgx.Tx) (err error)) (err error) {
+// Txs 事物
+func Txs(dbs []string, handle func(txs []pgx.Tx) (err error)) (err error) {
 	var ps []*pgxpool.Pool
-	if db == nil || len(db) == 0 {
+	if dbs == nil || len(dbs) == 0 {
 		ps = []*pgxpool.Pool{mainPool}
 	} else {
-		ps = make([]*pgxpool.Pool, len(db))
-		for i, v := range db {
+		ps = make([]*pgxpool.Pool, len(dbs))
+		for i, v := range dbs {
 			p := pools[v]
 			if p == nil {
 				err = errors.New(fmt.Sprintf("db[%s] is not exist", v))
@@ -58,10 +85,10 @@ func Tx(db []string, handle func(tx []pgx.Tx) (err error)) (err error) {
 		}
 	}
 
-	tx := make([]pgx.Tx, len(db))
+	txs := make([]pgx.Tx, len(dbs))
 	for i, pool := range ps {
 		//开启事物
-		if tx[i], err = pool.Begin(context.Background()); err != nil {
+		if txs[i], err = pool.Begin(context.Background()); err != nil {
 			log.Println(pcolor.Error(err))
 			return
 		}
@@ -69,21 +96,21 @@ func Tx(db []string, handle func(tx []pgx.Tx) (err error)) (err error) {
 
 	defer func() {
 		if err != nil {
-			for _, t := range tx {
-				if rollbackErr := t.Rollback(context.Background()); rollbackErr != nil {
-					log.Println(rollbackErr)
+			for _, tx := range txs {
+				if rollbackErr := tx.Rollback(context.Background()); rollbackErr != nil {
+					log.Println(pcolor.Error(rollbackErr))
 				}
 			}
 		} else {
-			for _, t := range tx {
-				if commitErr := t.Commit(context.Background()); commitErr != nil {
-					log.Println(commitErr)
+			for _, tx := range txs {
+				if commitErr := tx.Commit(context.Background()); commitErr != nil {
+					log.Println(pcolor.Error(commitErr))
 				}
 			}
 		}
 	}()
 
-	if err = handle(tx); err != nil {
+	if err = handle(txs); err != nil {
 		log.Println(pcolor.Error(err))
 		return
 	}
@@ -126,8 +153,7 @@ func TxQuery(tx pgx.Tx, query string, args ...any) (rows pgx.Rows, err error) {
 
 // TxQueryRow 事物内查询
 func TxQueryRow(tx pgx.Tx, query string, args ...any) (row pgx.Row) {
-	row = tx.QueryRow(context.Background(), query, args...)
-	return
+	return tx.QueryRow(context.Background(), query, args...)
 }
 
 func TxQueryRowScan[T any](tx pgx.Tx, query string, args ...any) (res T, err error) {

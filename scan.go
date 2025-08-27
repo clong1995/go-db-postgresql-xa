@@ -3,10 +3,11 @@ package db
 import (
 	"errors"
 	"fmt"
-	"github.com/clong1995/go-ansi-color"
-	"github.com/jackc/pgx/v5"
 	"log"
 	"reflect"
+
+	"github.com/clong1995/go-ansi-color"
+	"github.com/jackc/pgx/v5"
 )
 
 func scan[T any](rows pgx.Rows) (res []T, err error) {

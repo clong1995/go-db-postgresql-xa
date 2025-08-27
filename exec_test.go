@@ -1,11 +1,12 @@
 package db
 
 import (
-	pcolor "github.com/clong1995/go-ansi-color"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"log"
 	"testing"
+
+	"github.com/clong1995/go-ansi-color"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func init() {

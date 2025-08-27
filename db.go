@@ -3,12 +3,13 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/clong1995/go-ansi-color"
-	"github.com/clong1995/go-config"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/clong1995/go-ansi-color"
+	"github.com/clong1995/go-config"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var pools map[string]*pgxpool.Pool
