@@ -11,11 +11,6 @@ import (
 )
 
 func scan[T any](rows pgx.Rows) (res []T, err error) {
-	if !rows.Next() {
-		res = make([]T, 0)
-		return
-	}
-
 	var obj T
 	typ := reflect.TypeOf(obj)
 	if typ.Kind() == reflect.Struct {
