@@ -16,7 +16,6 @@ func init() {
 func TestQueryRow(t *testing.T) {
 	defer Close()
 	type args struct {
-		db    string
 		query string
 		args  []any
 	}
@@ -29,7 +28,6 @@ func TestQueryRow(t *testing.T) {
 		{
 			name: "QueryRow",
 			args: args{
-				db:    "access",
 				query: "SELECT id,name FROM role WHERE id = $1",
 				args: []any{
 					160858030168911872,
@@ -39,7 +37,7 @@ func TestQueryRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRow, err := QueryRow(tt.args.db, tt.args.query, tt.args.args...)
+			gotRow, err := QueryRow(tt.args.query, tt.args.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("QueryRow() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -58,7 +56,6 @@ func TestQueryRow(t *testing.T) {
 func TestQueryRowScan(t *testing.T) {
 	defer Close()
 	type args struct {
-		db    string
 		query string
 		args  []any
 	}
@@ -72,7 +69,6 @@ func TestQueryRowScan(t *testing.T) {
 		{
 			name: "QueryRowScan",
 			args: args{
-				db:    "access",
 				query: "SELECT id,name FROM role WHERE id = $1",
 				args: []any{
 					160858030168911872,
@@ -82,7 +78,7 @@ func TestQueryRowScan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := QueryRowScan[field](tt.args.db, tt.args.query, tt.args.args...)
+			gotRes, err := QueryRowScan[field](tt.args.query, tt.args.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("QueryRowScan() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -96,7 +92,6 @@ func TestQueryRowScan(t *testing.T) {
 func TestQuery(t *testing.T) {
 	defer Close()
 	type args struct {
-		db    string
 		query string
 		args  []any
 	}
@@ -109,7 +104,6 @@ func TestQuery(t *testing.T) {
 		{
 			name: "Query",
 			args: args{
-				db:    "access",
 				query: "SELECT id,name FROM role",
 				args:  []any{},
 			},
@@ -117,7 +111,7 @@ func TestQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRows, err := Query(tt.args.db, tt.args.query, tt.args.args...)
+			gotRows, err := Query(tt.args.query, tt.args.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Query() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -142,7 +136,6 @@ func TestQuery(t *testing.T) {
 func TestQueryScan(t *testing.T) {
 	defer Close()
 	type args struct {
-		db    string
 		query string
 		args  []any
 	}
@@ -156,7 +149,6 @@ func TestQueryScan(t *testing.T) {
 		{
 			name: "QueryScan",
 			args: args{
-				db:    "access",
 				query: "SELECT id,name FROM role",
 				args:  []any{},
 			},
@@ -164,7 +156,7 @@ func TestQueryScan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := QueryScan[field](tt.args.db, tt.args.query, tt.args.args...)
+			gotRes, err := QueryScan[field](tt.args.query, tt.args.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("QueryScan() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -182,7 +174,6 @@ type field struct {
 func TestExec(t *testing.T) {
 	defer Close()
 	type args struct {
-		db    string
 		query string
 		args  []any
 	}
@@ -195,7 +186,6 @@ func TestExec(t *testing.T) {
 		{
 			name: "Exec",
 			args: args{
-				db:    "access",
 				query: "INSERT INTO role (id, name,description,key) VALUES ($1, $2,'测试','sc')",
 				args:  []any{162040587868221441, "测试"},
 			},
@@ -203,7 +193,7 @@ func TestExec(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotResult, err := Exec(tt.args.db, tt.args.query, tt.args.args...)
+			gotResult, err := Exec(tt.args.query, tt.args.args...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Exec() error = %v, wantErr %v", err, tt.wantErr)
 				return

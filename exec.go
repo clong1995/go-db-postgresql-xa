@@ -13,7 +13,11 @@ import (
 )
 
 // QueryRow 查询一条
-func QueryRow(db, query string, args ...any) (row pgx.Row, err error) {
+func QueryRow(query string, args ...any) (row pgx.Row, err error) {
+	return QueryRowDB("", query, args...)
+}
+
+func QueryRowDB(db, query string, args ...any) (row pgx.Row, err error) {
 	pool, err := singlePool(db)
 	if err != nil {
 		log.Println(pcolor.Error(err))
@@ -24,7 +28,11 @@ func QueryRow(db, query string, args ...any) (row pgx.Row, err error) {
 }
 
 // QueryRowScan 查询并扫描
-func QueryRowScan[T any](db, query string, args ...any) (res T, err error) {
+func QueryRowScan[T any](query string, args ...any) (res T, err error) {
+	return QueryRowScanDB[T]("", query, args...)
+}
+
+func QueryRowScanDB[T any](db, query string, args ...any) (res T, err error) {
 	pool, err := singlePool(db)
 	if err != nil {
 		log.Println(pcolor.Error(err))
@@ -44,7 +52,10 @@ func QueryRowScan[T any](db, query string, args ...any) (res T, err error) {
 }
 
 // Exec 执行
-func Exec(db, query string, args ...any) (result pgconn.CommandTag, err error) {
+func Exec(query string, args ...any) (result pgconn.CommandTag, err error) {
+	return ExecDB("", query, args...)
+}
+func ExecDB(db, query string, args ...any) (result pgconn.CommandTag, err error) {
 	pool, err := singlePool(db)
 	if err != nil {
 		log.Println(pcolor.Error(err))
@@ -58,7 +69,10 @@ func Exec(db, query string, args ...any) (result pgconn.CommandTag, err error) {
 }
 
 // Query 查询
-func Query(db, query string, args ...any) (rows pgx.Rows, err error) {
+func Query(query string, args ...any) (rows pgx.Rows, err error) {
+	return QueryDB("", query, args...)
+}
+func QueryDB(db, query string, args ...any) (rows pgx.Rows, err error) {
 	pool, err := singlePool(db)
 	if err != nil {
 		log.Println(pcolor.Error(err))
@@ -72,8 +86,11 @@ func Query(db, query string, args ...any) (rows pgx.Rows, err error) {
 }
 
 // QueryScan 查询并扫描
-func QueryScan[T any](db, query string, args ...any) (res []T, err error) {
-	rows, err := Query(db, query, args...)
+func QueryScan[T any](query string, args ...any) (res []T, err error) {
+	return QueryScanDB[T]("", query, args...)
+}
+func QueryScanDB[T any](db, query string, args ...any) (res []T, err error) {
+	rows, err := QueryDB(db, query, args...)
 	if err != nil {
 		log.Println(pcolor.Error(err))
 		return
