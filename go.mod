@@ -1,4 +1,4 @@
-module github.com/clong1995/go-db-postgresql-XA
+module github.com/clong1995/go-db-postgresql-xa
 
 go 1.24
 
