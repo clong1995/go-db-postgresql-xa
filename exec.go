@@ -107,12 +107,17 @@ func singlePool(db string) (pool *pgxpool.Pool, err error) {
 	if db == "" {
 		pool = mainPool
 	} else {
-		pool = pools[db]
+		pool = GetPool(db)
 		if pool == nil {
 			err = errors.New(fmt.Sprintf("db[%s] is not exist", db))
 			log.Println(pcolor.Error(err))
 			return
 		}
 	}
+	return
+}
+
+func GetPool(db string) (pool *pgxpool.Pool) {
+	pool = pools[db]
 	return
 }
