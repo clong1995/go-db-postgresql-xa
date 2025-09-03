@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -47,13 +46,13 @@ func init() {
 		database := conf.ConnConfig.Database
 		pools[database] = pool
 
-		fmt.Println(pcolor.Succ("[PostgreSQL] conn %s", database))
+		log.Println(pcolor.Succ("[PostgreSQL] conn %s", database))
 	}
 }
 
 func Close() {
-	for _, v := range pools {
+	for k, v := range pools {
 		v.Close()
-		fmt.Println(pcolor.Succ("[PostgreSQL] %s closed", v.Config().ConnConfig.Database))
+		log.Println(pcolor.Succ("[PostgreSQL] %s closed", k))
 	}
 }

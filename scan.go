@@ -1,8 +1,6 @@
 package db
 
 import (
-	"errors"
-	"fmt"
 	"log"
 	"reflect"
 
@@ -15,7 +13,7 @@ func scan[T any](rows pgx.Rows) (res []T, err error) {
 	typ := reflect.TypeOf(obj)
 	if typ.Kind() == reflect.Struct {
 		if res, err = pgx.CollectRows[T](rows, pgx.RowToStructByPos[T]); err != nil {
-			fmt.Println(pcolor.Err("CollectRows error: %v", err))
+			log.Println(pcolor.Err("CollectRows error: %v", err))
 			return
 		}
 	} else {
@@ -31,7 +29,7 @@ func scan[T any](rows pgx.Rows) (res []T, err error) {
 	return
 }
 
-func scanOne[T any](rows pgx.Rows) (res T, err error) {
+/*func scanOne[T any](rows pgx.Rows) (res T, err error) {
 	if res, err = pgx.CollectOneRow[T](
 		rows,
 		pgx.RowToStructByPos[T],
@@ -43,4 +41,4 @@ func scanOne[T any](rows pgx.Rows) (res T, err error) {
 	}
 
 	return
-}
+}*/

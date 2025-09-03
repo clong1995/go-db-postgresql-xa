@@ -151,7 +151,7 @@ func TxQuery(tx pgx.Tx, query string, args ...any) (rows pgx.Rows, err error) {
 	return
 }
 
-// TxQueryRow 事物内查询
+/*// TxQueryRow 事物内查询
 func TxQueryRow(tx pgx.Tx, query string, args ...any) (row pgx.Row) {
 	return tx.QueryRow(context.Background(), query, args...)
 }
@@ -167,4 +167,4 @@ func TxQueryRowScan[T any](tx pgx.Tx, query string, args ...any) (res T, err err
 		return
 	}
 	return
-}
+}*/

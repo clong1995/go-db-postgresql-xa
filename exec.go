@@ -12,7 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// QueryRow 查询一条
+/*// QueryRow 查询一条
 func QueryRow(query string, args ...any) (row pgx.Row, err error) {
 	return QueryRowDB("", query, args...)
 }
@@ -44,12 +44,14 @@ func QueryRowScanDB[T any](db, query string, args ...any) (res T, err error) {
 		log.Println(pcolor.Error(err))
 		return
 	}
+	//CollectOneRow执行了close
+	//defer rows.Close()
 	if res, err = scanOne[T](rows); err != nil {
 		log.Println(pcolor.Error(err))
 		return
 	}
 	return
-}
+}*/
 
 // Exec 执行
 func Exec(query string, args ...any) (result pgconn.CommandTag, err error) {
